@@ -1,0 +1,8 @@
+{
+  "name": "adhd-working-mode",
+  "description": "Created to support my ADHD, probably useful for everyone. Always-on Claude Code working-mode skill that helps you stay in-flow, action-first, one step at a time. Transparent by default.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Domi"
+  }
+}
