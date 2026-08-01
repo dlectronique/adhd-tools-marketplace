@@ -8,6 +8,11 @@
       "name": "adhd-working-mode",
       "source": "./plugins/adhd-working-mode",
       "description": "Created to support my ADHD, probably useful for everyone. Always-on Claude Code working-mode skill that helps you stay in-flow, action-first, one step at a time. Transparent by default."
+    },
+    {
+      "name": "memory-inherit",
+      "source": "./plugins/memory-inherit",
+      "description": "Claude Code's memory is keyed to the exact working directory, so a repo checkout and every git worktree under it each get their own empty store — memory reads as blank exactly where you do most of your work, with no error to tell you. This makes it inherit: on session start it links the current directory at the nearest ancestor that already has memory."
     }
   ]
 }
