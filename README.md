@@ -1,8 +1,25 @@
-# ADHD working mode — a Claude Code skill
+# adhd-tools — a Claude Code marketplace
 
-*Created to support my ADHD, probably useful for everyone. Always-on Claude Code working-mode skill that helps you stay in-flow, action-first, one step at a time. Transparent by default.*
+Two plugins, both built for the same reason: **reduce the friction between having a thought and shipping the thing.** Built by and for someone with ADHD — you don't need ADHD to benefit.
 
-**Built by and for someone with ADHD — but you don't need ADHD to benefit.**
+| Plugin | What it fixes |
+|---|---|
+| [**adhd-working-mode**](plugins/adhd-working-mode) | Claude talks in walls of text, hands you twelve options, and makes you re-explain context |
+| [**memory-inherit**](plugins/memory-inherit) | Claude's memory silently reads as empty in repos and git worktrees |
+
+```
+/plugin marketplace add dlectronique/adhd-tools-marketplace
+/plugin install adhd-working-mode@adhd-tools
+/plugin install memory-inherit@adhd-tools
+```
+
+> `/plugin` exists in the terminal `claude` CLI, not the editor extension.
+
+---
+
+## adhd-working-mode
+
+*Always-on working mode that keeps you in flow, action-first, one step at a time. Transparent by default.*
 
 If you've ever lost the thread halfway through a wall of text, stalled out staring at a vague twelve-step task, or groaned at re-explaining context you know you already gave — this is for you. ADHD just turns the volume all the way up on friction that everyone feels, which makes it a great design target: build for the person who feels it most, and the result is calmer, faster, and clearer for everyone.
 
@@ -16,24 +33,38 @@ It's an always-on working *mode* for collaborating with Claude on real software 
 - **Run work in parallel** so nothing waits, while still handing you a single focus.
 - **Build to a real production bar** (tests, security, a11y, conventions) — the leanness is in the *packaging*, never the rigor.
 
-## Install
+Start a new session after installing — the skill applies by default. Ask Claude for depth anytime; this sets the default, not a ceiling.
 
-```
-/plugin marketplace add dlectronique/adhd-mode-marketplace
-/plugin install adhd-working-mode@adhd-mode
-```
+---
 
-(Assumes the repo lives at `github.com/dlectronique/adhd-mode-marketplace`.)
+## memory-inherit
 
-Then start a new session — the skill applies by default. Ask Claude for depth anytime; this sets the default, not a ceiling.
+*Your memory isn't missing. It's in a directory Claude isn't looking at.*
+
+Claude Code keys auto-memory to your **exact** working directory. A repo checkout and every git worktree under it are different directories, so they get different stores — open a session one level down from where your memory was written and Claude sees nothing. No warning, no error, just a model that has apparently forgotten everything.
+
+It's the same failure the working-mode skill exists to prevent, one layer down: you end up re-explaining context you already gave, except this time it isn't Claude's manners, it's the filesystem.
+
+This plugin makes memory inherit. On session start it links the current directory at the nearest ancestor that already has memory — so a tree opts in just by having memory at its root, with no config to maintain as worktrees come and go.
+
+Ships with `/memory-doctor` to check whether memory actually resolves where you are. Full detail in the [plugin README](plugins/memory-inherit).
+
+---
 
 ## What's inside
 
 ```
-.claude-plugin/marketplace.json          # marketplace manifest
-plugins/adhd-working-mode/
-├── .claude-plugin/plugin.json            # plugin manifest
-└── skills/adhd-working-mode/SKILL.md     # the skill itself
+.claude-plugin/marketplace.json              marketplace manifest
+plugins/
+├── adhd-working-mode/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/adhd-working-mode/SKILL.md    the skill itself
+└── memory-inherit/
+    ├── .claude-plugin/plugin.json
+    ├── hooks/hooks.json                     SessionStart registration
+    ├── commands/memory-doctor.md            /memory-doctor
+    ├── scripts/                             the hook and the doctor
+    └── tests/test-memory-inherit.sh         16 cases, throwaway $HOME
 ```
 
 ## License
