@@ -17,7 +17,15 @@ fail=0
 
 ok()   { printf '  ok   %s\n' "$1"; pass=$((pass + 1)); }
 bad()  { printf '  FAIL %s\n     expected: %s\n     actual:   %s\n' "$1" "$2" "$3"; fail=$((fail + 1)); }
-check() { [ "$2" = "$3" ] && ok "$1" || bad "$1" "$2" "$3"; }
+# Spelled out rather than `A && B || C`: that form also runs C when B fails,
+# which in an assertion helper would report a phantom failure.
+check() {
+    if [ "$2" = "$3" ]; then
+        ok "$1"
+    else
+        bad "$1" "$2" "$3"
+    fi
+}
 
 slug_of() { printf '%s' "$1" | tr '/._' '---'; }
 
@@ -135,6 +143,7 @@ check "used the transcript slug" "yes" "$([ -L "$PROJECTS/odd-slug-9/memory" ] &
 check "did not use the derived slug" "no" "$([ -e "$(memory_of "$child2")" ] && echo yes || echo no)"
 
 # ── 9. Never climb above $HOME ───────────────────────────────────────────────
+# shellcheck disable=SC2016  # literal $HOME in the heading, not an expansion
 printf '\n9. the walk stops at $HOME\n'
 new_sandbox
 outside="$(mktemp -d)"

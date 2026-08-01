@@ -1,0 +1,96 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Read-only, and `pull_request` rather than `pull_request_target`, so a fork's
+# PR never runs with a writable token. Nothing here consumes event data.
+permissions:
+  contents: read
+
+jobs:
+  # The plugin ships a hook that runs on every session start, on whatever
+  # machine installed it. Both platforms matter, and they differ: readlink and
+  # find are BSD on macOS and GNU on Linux.
+  suite:
+    name: suite (${{ matrix.os }}, jq ${{ matrix.jq }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        # "present"/"absent" rather than yes/no on purpose — YAML 1.1 parses
+        # bare yes and no as booleans, which would silently break the
+        # comparisons below.
+        jq: ["present"]
+        include:
+          # The hook parses its JSON payload with jq when available and falls
+          # back to sed when it isn't. Without this case the fallback — the
+          # path a bare machine actually takes — is never executed.
+          - os: ubuntu-latest
+            jq: "absent"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove jq
+        if: matrix.jq == 'absent'
+        run: sudo rm -f "$(command -v jq)"
+
+      - name: Confirm jq state matches the matrix
+        env:
+          EXPECTED: ${{ matrix.jq }}
+        run: |
+          if command -v jq >/dev/null 2>&1; then have=present; else have=absent; fi
+          echo "jq is $have, expected $EXPECTED"
+          [ "$have" = "$EXPECTED" ]
+
+      - name: Run the suite
+        run: ./plugins/memory-inherit/tests/test-memory-inherit.sh
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: Lint every shipped script
+        run: find plugins -name '*.sh' -print0 | xargs -0 shellcheck
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Manifests parse
+        run: |
+          find . -path ./.git -prune -o -name '*.json' -print |
+            while read -r f; do jq -e . "$f" >/dev/null || exit 1; done
+
+      - name: Every marketplace entry resolves to a real plugin
+        run: |
+          jq -r '.plugins[].source' .claude-plugin/marketplace.json |
+            while read -r src; do
+              test -f "$src/.claude-plugin/plugin.json" || {
+                echo "missing plugin manifest: $src"; exit 1; }
+              echo "ok $src"
+            done
+
+      - name: Hook commands point at files that exist and are executable
+        run: |
+          find plugins -name hooks.json | while read -r hooks; do
+            root="$(dirname "$(dirname "$hooks")")"
+            jq -r '.hooks[][].hooks[].command' "$hooks" |
+              sed -e 's/^bash //' -e 's/"//g' -e "s#\${CLAUDE_PLUGIN_ROOT}#$root#" |
+              while read -r script; do
+                test -x "$script" || { echo "not executable: $script"; exit 1; }
+                echo "ok $script"
+              done
+          done
+
+      - name: Shipped scripts keep their executable bit
+        run: |
+          find plugins -name '*.sh' | while read -r f; do
+            test -x "$f" || { echo "lost +x: $f"; exit 1; }
+          done
