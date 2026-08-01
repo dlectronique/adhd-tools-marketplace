@@ -1,4 +1,4 @@
-# adhd-mode — a Claude Code marketplace
+# adhd-tools — a Claude Code marketplace
 
 Two plugins, both built for the same reason: **reduce the friction between having a thought and shipping the thing.** Built by and for someone with ADHD — you don't need ADHD to benefit.
 
@@ -8,9 +8,9 @@ Two plugins, both built for the same reason: **reduce the friction between havin
 | [**memory-inherit**](plugins/memory-inherit) | Claude's memory silently reads as empty in repos and git worktrees |
 
 ```
-/plugin marketplace add dlectronique/adhd-mode-marketplace
-/plugin install adhd-working-mode@adhd-mode
-/plugin install memory-inherit@adhd-mode
+/plugin marketplace add dlectronique/adhd-tools-marketplace
+/plugin install adhd-working-mode@adhd-tools
+/plugin install memory-inherit@adhd-tools
 ```
 
 > `/plugin` exists in the terminal `claude` CLI, not the editor extension.

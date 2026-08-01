@@ -44,8 +44,8 @@ file, no list of paths, and nothing to update as worktrees come and go.
 ## Install
 
 ```
-/plugin marketplace add dlectronique/adhd-mode-marketplace
-/plugin install memory-inherit@adhd-mode
+/plugin marketplace add dlectronique/adhd-tools-marketplace
+/plugin install memory-inherit@adhd-tools
 ```
 
 Then start a new session. Installing is the entire setup — the plugin brings
