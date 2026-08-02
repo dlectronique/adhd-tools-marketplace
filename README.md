@@ -32,6 +32,7 @@ It's an always-on working *mode* for collaborating with Claude on real software 
 - **Estimate time concretely**, name where you are in a sequence, celebrate real wins, catch rabbit-holes, and know when to stop.
 - **Run work in parallel** so nothing waits, while still handing you a single focus.
 - **Build to a real production bar** (tests, security, a11y, conventions) — the leanness is in the *packaging*, never the rigor.
+- **Prove a negative before reporting one** — "no findings" and "looked in the wrong place" produce identical output, and only one of them is good news.
 
 Start a new session after installing — the skill applies by default. Ask Claude for depth anytime; this sets the default, not a ceiling.
 
